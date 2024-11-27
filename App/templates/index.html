@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Signature Verification</title>
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Signature Verification</h1>
+        <p class="subtitle">Upload two signature images to verify their authenticity.</p>
+        
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <ul class="flashes">
+            {% for category, message in messages %}
+            <li class="{{ category }}">{{ message }}</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+        {% endwith %}
+
+        <!-- Upload Form -->
+        <form action="/" method="POST" enctype="multipart/form-data">
+            <div class="upload-section">
+                <div class="file-input">
+                    <label for="image1">Original Signature:</label>
+                    <input type="file" name="image1" id="image1" accept="image/*" onchange="previewImage(event, 'preview1')" required>
+                    <div class="image-preview">
+                        <img id="preview1" src="#" alt="Original Signature Preview" style="display:none;">
+                    </div>
+                </div>
+
+                <div class="file-input">
+                    <label for="image2">Verification Signature:</label>
+                    <input type="file" name="image2" id="image2" accept="image/*" onchange="previewImage(event, 'preview2')" required>
+                    <div class="image-preview">
+                        <img id="preview2" src="#" alt="Verification Signature Preview" style="display:none;">
+                    </div>
+                </div>
+            </div>
+            <button type="submit">Verify Signatures</button>
+        </form>
+
+        <!-- Display Results -->
+        {% if filepath1 and filepath2 %}
+        <div class="results">
+            <h2>Results</h2>
+            <div class="result-images">
+                <div class="result-image">
+                    <h3>Original</h3>
+                    <img src="{{ filepath1 }}" alt="Original Signature">
+                </div>
+                <div class="result-image">
+                    <h3>Verification</h3>
+                    <img src="{{ filepath2 }}" alt="Verification Signature">
+                </div>
+            </div>
+            <p><strong>Matching Probability:</strong> {{ match_probability }}%</p>
+            <p><strong>Result:</strong> {{ result }}</p>
+        </div>
+        {% endif %}
+    </div>
+
+    <script>
+        function previewImage(event, previewId) {
+            const file = event.target.files[0];
+            const preview = document.getElementById(previewId);
+
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    preview.src = e.target.result;
+                    preview.style.display = "block";
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+    </script>
+</body>
+</html>
