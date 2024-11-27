@@ -48,15 +48,13 @@ def index():
         # Preprocess the images
         img1, img2 = preprocess_images(filepath1, filepath2, resize=224)
 
-        # Run inference
-        with torch.no_grad():
+        with torch.inference_mode():
             img1, img2 = img1.to(DEVICE), img2.to(DEVICE)
-            output = model(img1, img2)
-            distance = output.item()  # Assuming the output is a distance score
+            distance = model(img1, img2).squeeze(0).cpu().numpy()       # ! Remove squeeze(0) if it does not work
 
         # Determine matching probability
         match_probability = (1 - distance) * 100
-        result = "Matched" if match_probability > 80 else "Not Matched"
+        result = "Matched" if distance < 0.242 else "Not Matched"
 
         return render_template(
             "index.html",
